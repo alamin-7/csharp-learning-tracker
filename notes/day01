@@ -1,0 +1,20 @@
+# Day 01
+
+## New C# Features
+
+- Named arguments
+- Optional parameters
+- Top-level statements
+- Nullable reference types
+- Collection expressions (`[]`)
+
+## Java vs C#
+
+- Java has no named arguments.
+- Java has no top-level statements.
+- C# compiler warns about nullable references.
+
+## Questions
+
+- When should I use `var`?
+- When should I use `const` vs `readonly`?

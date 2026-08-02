@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LearningTracker/LearningTracker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LearningTracker.Tests/LearningTracker.Tests.csproj" />
+  </Folder>
+</Solution>
