@@ -1,0 +1,7 @@
+
+## Java vs C#
+
+- C# properties reduce getter/setter boilerplate.
+- private set allows controlled state changes.
+- init allows assignment only during initialization.
+- required forces important properties to be provided.
