@@ -1,0 +1,22 @@
+# Day 05
+
+## Learned
+
+- Interfaces
+- Service Layer
+- Constructor Injection
+- Dependency Inversion
+- IReadOnlyCollection
+
+## Java vs C#
+
+- Interfaces work almost identically.
+- Constructor injection follows the same pattern.
+- Program.cs should stay thin.
+- Business logic belongs in services.
+
+## Questions
+
+- Why return IReadOnlyCollection instead of List?
+- When should I create an interface?
+- When is a service responsible for validation?

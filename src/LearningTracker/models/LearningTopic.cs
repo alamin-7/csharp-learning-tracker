@@ -5,7 +5,7 @@ public class LearningTopic
     public Guid id { get;}
     public string Name { get; }
     public DateTime CreatedAt { get; }
-    public bool IsCompleted { get; private set; }
+    public TopicStatus Status { get; private set; }
 
     public LearningTopic(string name)
     {
@@ -17,12 +17,24 @@ public class LearningTopic
         id = Guid.NewGuid();
         Name = name;
         CreatedAt = DateTime.Now;
-        IsCompleted = false;
+        Status = TopicStatus.NotStarted;
     }
 
-    public void MarkAsCompleted()
+
+    public void Start()
     {
-        IsCompleted = true;
+        if (Status == TopicStatus.Completed)
+        {
+            throw new InvalidOperationException(
+                "A completed topic cannot be started again.");
+        }
+
+        Status = TopicStatus.InProgress;
+    }
+
+    public void UpdateStatus(TopicStatus status)
+    {
+        Status = status;
     }
 
 }

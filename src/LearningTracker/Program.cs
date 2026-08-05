@@ -1,9 +1,7 @@
 ﻿using LearningTracker.models;
 
-List<LearningTopic> topics =[];
-
-
 bool running = true;
+LearningTopicServiceImpl topicService = new LearningTopicServiceImpl();
 
 while (running)
 {
@@ -14,16 +12,20 @@ while (running)
     switch (option)
     {
         case "1":
-            AddTopic(topics);
+            addTopic(topicService);
             break;
 
         case "2":
-            ShowTopics(topics);
+            ShowTopics(topicService);
             break;
 
         case "3":
-            running = false;
+            UpdateTopicStatus(topicService);
             break;
+
+        case "4":
+            running = false;
+            break;    
 
         default:
             Console.WriteLine("Invalid option.");
@@ -31,6 +33,116 @@ while (running)
     }
 }
 
+void addTopic(LearningTopicServiceImpl topicService)
+{
+    Console.Write("Enter topic name: ");
+    string? name = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("Topic name cannot be empty.");
+        return;
+    }
+
+    try
+    {
+        topicService.AddTopic(name);
+        Console.WriteLine($"Topic '{name}' added successfully.");
+    }
+    catch (InvalidOperationException ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+}
+
+void showCompletedTopics(LearningTopicServiceImpl topicService)
+{
+    var completedTopics = topicService.GetCompletedTopics();
+
+    if (!completedTopics.Any())
+    {
+        Console.WriteLine("No completed topics found.");
+        return;
+    }
+
+    Console.WriteLine("Completed Topics:");
+    foreach (var topic in completedTopics)
+    {
+        Console.WriteLine($"- {topic.Name} (Status: {topic.Status})");
+    }
+}
+
+void ShowTopics(LearningTopicServiceImpl topicService)
+{
+    var topics = topicService.GetAllTopics();
+
+    if (!topics.Any())
+    {
+        Console.WriteLine("No topics found.");
+        return;
+    }
+
+    Console.WriteLine("Topics:");
+    foreach (var topic in topics)
+    {
+        Console.WriteLine($"- {topic.Name} (Status: {topic.Status})");
+    }
+}
+
+void UpdateTopicStatus(LearningTopicService topicService)
+{
+    Console.Write("Enter topic name: ");
+    string? topicName = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(topicName))
+    {
+        Console.WriteLine("Topic name is required.");
+        return;
+    }
+
+    var topic = topicService.SearchByName(topicName);
+
+    if (topic is null)
+    {
+        Console.WriteLine("Topic not found.");
+        return;
+    }
+
+    Console.WriteLine($"Current status: {topic.Status}");
+    Console.WriteLine();
+    Console.WriteLine("Select new status:");
+    Console.WriteLine("1. Planned");
+    Console.WriteLine("2. In Progress");
+    Console.WriteLine("3. Completed");
+    Console.Write("Select: ");
+
+    string? statusInput = Console.ReadLine();
+
+    TopicStatus newStatus;
+
+    switch (statusInput)
+    {
+        case "1":
+            newStatus = TopicStatus.NotStarted;
+            break;
+
+        case "2":
+            newStatus = TopicStatus.InProgress;
+            break;
+
+        case "3":
+            newStatus = TopicStatus.Completed;
+            break;
+
+        default:
+            Console.WriteLine("Invalid status.");
+            return;
+    }
+
+    topicService.UpdateTopicStatus(topic.Name, newStatus);
+
+    Console.WriteLine($"'{topic.Name}' updated to {newStatus}.");
+}
 static void ShowMenu()
 {
     Console.WriteLine();
@@ -40,63 +152,4 @@ static void ShowMenu()
     Console.WriteLine("3. Mark Topic as Completed");
     Console.WriteLine("4. Exit");
     Console.Write("Select: ");
-}
-
-static void AddTopic(List<LearningTopic> topics)
-{
-    Console.Write("Topic: ");
-    string? topicName = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(topicName))
-    {
-        Console.WriteLine("Topic name is required.");
-        return;
-    }
-
-    LearningTopic topic = new LearningTopic(topicName);
-
-    topics.Add(topic);
-
-    Console.WriteLine("Topic added.");
-}
-
-static void ShowTopics(List<LearningTopic> topics)
-{
-    if (topics.Count == 0)
-    {
-        Console.WriteLine("No topics found.");
-        return;
-    }
-
-    foreach (LearningTopic topic in topics)
-    {
-        Console.WriteLine(
-            $"{topic.id} | {topic.Name} | Completed: {topic.IsCompleted}"
-        );
-    }
-}
-
-static void CompleteTopic(List<LearningTopic> topics)
-{
-    Console.Write("Enter topic ID: ");
-    string? input = Console.ReadLine();
-
-    if (!Guid.TryParse(input, out Guid topicId))
-    {
-        Console.WriteLine("Invalid topic ID.");
-        return;
-    }
-
-    LearningTopic? topic = topics
-        .FirstOrDefault(topic => topic.id == topicId);
-
-    if (topic is null)
-    {
-        Console.WriteLine("Topic not found.");
-        return;
-    }
-
-    topic.MarkAsCompleted();
-
-    Console.WriteLine("Topic completed.");
 }
