@@ -1,0 +1,26 @@
+# Day 07
+
+## C# / .NET concepts
+
+- Task represents asynchronous work.
+- Task<T> eventually returns T.
+- async enables await.
+- await does not automatically create a new thread.
+- Avoid async void except event handlers.
+- Async methods conventionally end with Async.
+- Prefer async all the way.
+- CancellationToken propagates cancellation.
+
+## Architecture
+
+Program -> Service -> Repository -> Storage
+
+Service should not know whether persistence is JSON,
+PostgreSQL, SQL Server, etc.
+
+## Java vs C#
+
+CompletableFuture<T> -> Task<T>
+Jackson -> System.Text.Json
+AutoCloseable -> IDisposable
+try-with-resources -> using

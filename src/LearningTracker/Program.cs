@@ -1,7 +1,14 @@
 ﻿using LearningTracker.models;
+using LearningTracker.repositories;
 
 bool running = true;
-LearningTopicServiceImpl topicService = new LearningTopicServiceImpl();
+string filePath = Path.Combine("data", "topics.json");
+
+LearningTopicRepository repository =
+    new JsonLearningTopicRepository(filePath);
+
+LearningTopicService topicService =
+    new LearningTopicServiceImpl(repository);
 
 while (running)
 {
@@ -12,15 +19,15 @@ while (running)
     switch (option)
     {
         case "1":
-            addTopic(topicService);
+            await addTopicAsync(topicService);
             break;
 
         case "2":
-            ShowTopics(topicService);
+            await ShowTopicsAsync(topicService);
             break;
 
         case "3":
-            UpdateTopicStatus(topicService);
+            await UpdateTopicStatusAsync(topicService);
             break;
 
         case "4":
@@ -33,7 +40,7 @@ while (running)
     }
 }
 
-void addTopic(LearningTopicServiceImpl topicService)
+async Task addTopicAsync(LearningTopicService topicService)
 {
     Console.Write("Enter topic name: ");
     string? name = Console.ReadLine();
@@ -46,7 +53,7 @@ void addTopic(LearningTopicServiceImpl topicService)
 
     try
     {
-        topicService.AddTopic(name);
+        await topicService.AddTopicAsync(name);
         Console.WriteLine($"Topic '{name}' added successfully.");
     }
     catch (InvalidOperationException ex)
@@ -55,9 +62,9 @@ void addTopic(LearningTopicServiceImpl topicService)
     }
 }
 
-void showCompletedTopics(LearningTopicServiceImpl topicService)
+async Task showCompletedTopics(LearningTopicService topicService)
 {
-    var completedTopics = topicService.GetCompletedTopics();
+    var completedTopics = await topicService.GetCompletedTopicsAsync();
 
     if (!completedTopics.Any())
     {
@@ -72,9 +79,9 @@ void showCompletedTopics(LearningTopicServiceImpl topicService)
     }
 }
 
-void ShowTopics(LearningTopicServiceImpl topicService)
+async Task ShowTopicsAsync(LearningTopicService topicService)
 {
-    var topics = topicService.GetAllTopics();
+    var topics = await topicService.GetAllTopicsAsync();
 
     if (!topics.Any())
     {
@@ -89,7 +96,7 @@ void ShowTopics(LearningTopicServiceImpl topicService)
     }
 }
 
-void UpdateTopicStatus(LearningTopicService topicService)
+async Task UpdateTopicStatusAsync(LearningTopicService topicService)
 {
     Console.Write("Enter topic name: ");
     string? topicName = Console.ReadLine();
@@ -100,7 +107,7 @@ void UpdateTopicStatus(LearningTopicService topicService)
         return;
     }
 
-    var topic = topicService.SearchByName(topicName);
+    var topic = await topicService.SearchByNameAsync(topicName);
 
     if (topic is null)
     {
@@ -139,7 +146,7 @@ void UpdateTopicStatus(LearningTopicService topicService)
             return;
     }
 
-    topicService.UpdateTopicStatus(topic.Name, newStatus);
+    await topicService.UpdateTopicStatusAsync(topic.Name, newStatus);
 
     Console.WriteLine($"'{topic.Name}' updated to {newStatus}.");
 }

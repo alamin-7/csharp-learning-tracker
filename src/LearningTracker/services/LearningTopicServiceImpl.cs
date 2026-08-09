@@ -1,79 +1,110 @@
 using LearningTracker.models;
+using LearningTracker.repositories;
 public class LearningTopicServiceImpl
     : LearningTopicService
 {
     private readonly List<LearningTopic> _topics = [];
+    private readonly LearningTopicRepository _repository;
 
-    public void AddTopic(string name)
+    public LearningTopicServiceImpl(
+        LearningTopicRepository repository)
     {
-        if (_topics.Any(topic =>
-            topic.Name.Equals(
+        _repository = repository;
+    }
+
+    public async Task AddTopicAsync(string name)
+    {
+        var topics = ((await _repository.GetAllAsync())
+            .ToList());
+
+        bool exists = topics.Any(
+            topic => topic.Name.Equals(
                 name,
-                StringComparison.OrdinalIgnoreCase)))
+                StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
         {
             throw new InvalidOperationException(
-                "Topic already exists.");
+                $"Topic '{name}' already exists.");
         }
 
-        _topics.Add(
-            new LearningTopic(name));
-    }
+        topics.Add(new LearningTopic(name));
 
-    public IReadOnlyCollection<LearningTopic>
-        GetAllTopics()
-    {
-        return _topics;
+        await _repository.SaveAllAsync(topics);        
     }
-
-    public LearningTopic? FindById(Guid id)
+    public async Task<IReadOnlyCollection<LearningTopic>> GetAllTopicsAsync()
     {
-        return _topics.FirstOrDefault(
-            topic => topic.id == id);
+        return await _repository.GetAllAsync();
     }
-
-    public IReadOnlyCollection<LearningTopic> GetCompletedTopics()
+        public async Task<IReadOnlyCollection<LearningTopic>>
+    GetCompletedTopicsAsync()
     {
-        return _topics.Where(
-            topic => topic.Status == TopicStatus.Completed)
+        var topics = await _repository.GetAllAsync();
+
+        return topics
+            .Where(topic =>
+                topic.Status == TopicStatus.Completed)
             .ToList();
     }
-
-    public void StartTopic(Guid id)
+    public async Task StartTopicAsync(Guid id)
     {
-        LearningTopic? topic =
-            FindById(id);
+        var topics = (await _repository.GetAllAsync()).ToList();
 
-        topic?.Start();
+        var topic = topics.FirstOrDefault(topic =>
+            topic.id == id);
+
+        if (topic is null)
+        {
+            throw new InvalidOperationException(
+                $"Topic with ID '{id}' was not found.");
+        }
+
+        topic.Start();
+
+        await _repository.SaveAllAsync(topics);
+    }
+    public async Task UpdateTopicStatusAsync(
+        string topicName,
+        TopicStatus status)
+    {
+        var topics = (await _repository.GetAllAsync()).ToList();
+
+        var topic = topics.FirstOrDefault(topic =>
+            topic.Name.Equals(
+                topicName,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (topic is null)
+        {
+            throw new InvalidOperationException(
+                $"Topic '{topicName}' was not found.");
+        }
+
+        switch (status)
+        {
+            case TopicStatus.InProgress:
+                topic.Start();
+                break;
+
+            case TopicStatus.Completed:
+                topic.UpdateStatus(TopicStatus.Completed);
+                break;
+
+            default:
+                topic.UpdateStatus(TopicStatus.NotStarted);
+                break;    
+        }
+
+        await _repository.SaveAllAsync(topics);
     }
 
-    public void UpdateTopicStatus(string topicName, TopicStatus status)
-{
-    var topic = SearchByName(topicName);
-
-    if (topic is null)
+    public async Task<LearningTopic?> SearchByNameAsync(
+        string name)
     {
-        throw new InvalidOperationException("Topic not found.");
-    }
+        var topics = await _repository.GetAllAsync();
 
-    switch (status)
-    {
-        case TopicStatus.NotStarted:
-            topic.Start();     
-            break;
-
-        case TopicStatus.InProgress:
-            topic.Start();
-            break;
-
-        case TopicStatus.Completed:
-            topic.UpdateStatus(TopicStatus.Completed);
-            break;
-    }
-}
-    public LearningTopic? SearchByName(string name)
-    {
-        return _topics.FirstOrDefault(
-            topic => topic.Name.Equals(
+        return topics.FirstOrDefault(topic =>
+            topic.Name.Equals(
                 name,
                 StringComparison.OrdinalIgnoreCase));
     }
