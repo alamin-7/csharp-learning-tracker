@@ -1,0 +1,26 @@
+# Day 09
+
+## Learned
+
+- ASP.NET Core
+- Controllers
+- Routing
+- HTTP verbs
+- DTOs
+- Model binding
+- ActionResult<T>
+- HTTP status codes
+- Swagger
+
+## Architecture
+
+HTTP -> Controller -> Service -> Repository
+
+## Java vs .NET
+
+@RestController -> [ApiController]
+@RequestMapping -> [Route]
+@GetMapping -> [HttpGet]
+@PostMapping -> [HttpPost]
+ResponseEntity<T> -> ActionResult<T>
+application.properties -> appsettings.json
