@@ -1,4 +1,6 @@
-using LearningTracker.repositories;
+using LearningTracker.Api.repositories;
+using LearningTracker.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,12 @@ builder.Services.AddControllers();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<LearningTrackerDbContext>(
+    options =>
+        options.UseSqlite(
+            builder.Configuration.GetConnectionString(
+                "LearningTracker")));
 
 var rootDataPath = Path.GetFullPath(
     Path.Combine(
@@ -17,9 +25,9 @@ var rootDataPath = Path.GetFullPath(
     )
 );
 
-builder.Services.AddSingleton<LearningTopicRepository>(
-    _ => new JsonLearningTopicRepository(rootDataPath)
-);
+builder.Services.AddScoped<
+    LearningTopicRepository,
+    EfLearningTopicRepository>();
 builder.Services.AddScoped<
     LearningTopicService,
     LearningTopicServiceImpl>();

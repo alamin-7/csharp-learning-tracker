@@ -2,10 +2,15 @@ namespace LearningTracker.models;
 
 public class LearningTopic
 {
-    public Guid id { get;}
-    public string Name { get; }
+
+    public Guid Id { get;}
+    public string Name { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; }
     public TopicStatus Status { get; private set; }
+
+     private LearningTopic()
+    {
+    }
 
     public LearningTopic(string name)
     {
@@ -14,7 +19,7 @@ public class LearningTopic
             throw new ArgumentException("Name cannot be empty.", nameof(name));
         }
 
-        id = Guid.NewGuid();
+        Id = Guid.NewGuid();
         Name = name;
         CreatedAt = DateTime.Now;
         Status = TopicStatus.NotStarted;
@@ -35,6 +40,14 @@ public class LearningTopic
     public void UpdateStatus(TopicStatus status)
     {
         Status = status;
+    }
+    public void Complete()
+    {
+        Status = TopicStatus.Completed;
+    }
+    public void Reset()
+    {
+        Status = TopicStatus.NotStarted;
     }
 
 }

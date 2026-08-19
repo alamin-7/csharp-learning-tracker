@@ -1,12 +1,12 @@
 using LearningTracker.models;
 public interface LearningTopicService
 {
-    Task AddTopicAsync(string name);
+    
+    Task<LearningTopic> AddTopicAsync(string name);
     Task<IReadOnlyCollection<LearningTopic>> GetAllTopicsAsync();
-    Task<IReadOnlyCollection<LearningTopic>> GetCompletedTopicsAsync();
-    Task StartTopicAsync(Guid id);
-    Task UpdateTopicStatusAsync(
-        string topicName,
-        TopicStatus status);
+    Task<LearningTopic?> FindByIdAsync(Guid id);
     Task<LearningTopic?> SearchByNameAsync(string name);
+    Task<IReadOnlyCollection<LearningTopic>> GetCompletedTopicsAsync();
+    Task UpdateTopicStatusAsync( Guid id,TopicStatus status);
+    Task DeleteTopicAsync(Guid id);
 }

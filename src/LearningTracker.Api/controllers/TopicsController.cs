@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
+using LearningTracker.Api.dtos;
 
 [ApiController]
 [Route("api/topics")]
@@ -11,8 +12,10 @@ public class TopicsController : ControllerBase
     {
         _learningTopicService = learningTopicService;
     }
-    [HttpGet("getAll")]
-public async Task<ActionResult<IEnumerable<TopicResponse>>>
+
+[HttpGet("all")]
+public async Task<
+    ActionResult<IEnumerable<TopicResponse>>>
     GetAll()
 {
     var topics =
@@ -21,7 +24,7 @@ public async Task<ActionResult<IEnumerable<TopicResponse>>>
     var response =
         topics.Select(topic =>
             new TopicResponse(
-                topic.id,
+                topic.Id,
                 topic.Name,
                 topic.Status));
 
@@ -29,20 +32,61 @@ public async Task<ActionResult<IEnumerable<TopicResponse>>>
 }
 
 [HttpPost("create")]
-public async Task<ActionResult> Create(
-    CreateTopicRequest request)
+public async Task<ActionResult<TopicResponse>>
+    Create(CreateTopicRequest request)
 {
-    if (string.IsNullOrWhiteSpace(request.name))
+    var topic =
+        await _learningTopicService.AddTopicAsync(
+            request.name);
+
+    var response =
+        new TopicResponse(
+            topic.Id,
+            topic.Name,
+            topic.Status);
+
+    return CreatedAtAction(
+        nameof(GetById),
+        new { id = topic.Id },
+        response);
+}
+[HttpGet("by-id/{id:guid}")]
+public async Task<ActionResult<TopicResponse>>
+    GetById(Guid id)
+{
+    var topic =
+        await _learningTopicService.FindByIdAsync(id);
+
+    if (topic is null)
     {
-        return BadRequest(
-            "Topic name is required.");
+        return NotFound();
     }
 
-    await _learningTopicService.AddTopicAsync(
-        request.name);
-
-    return Created();
+    return Ok(
+        new TopicResponse(
+            topic.Id,
+            topic.Name,
+            topic.Status));
 }
+[HttpPut("{id:guid}/status")]
+public async Task<IActionResult>
+    UpdateStatus(
+        Guid id,
+        UpdateTopicStatusRequest request)
+{
+    await _learningTopicService.UpdateTopicStatusAsync(
+        id,
+        request.Status);
 
+    return NoContent();
+}
+[HttpDelete("{id:guid}")]
+public async Task<IActionResult>
+    Delete(Guid id)
+{
+    await _learningTopicService.DeleteTopicAsync(id);
+
+    return NoContent();
+}
 }
 

@@ -1,0 +1,31 @@
+# Day 10
+
+## Learned
+
+- EF Core
+- DbContext
+- DbSet<T>
+- SQLite provider
+- Connection strings
+- Migrations
+- LINQ to SQL
+- Change tracking
+- AsNoTracking
+- Relationships
+- Include
+
+## Architecture
+
+Controller
+-> Service
+-> Repository
+-> DbContext
+-> Database
+
+## Java vs .NET
+
+JPA/Hibernate -> EF Core
+EntityManager -> DbContext
+JPQL -> LINQ
+Flyway/Liquibase -> EF migrations
+Persistence context -> Change tracker

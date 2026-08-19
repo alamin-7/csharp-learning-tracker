@@ -2,7 +2,7 @@ using LearningTracker.models;
 using System.Text.Json;
 
 namespace LearningTracker.repositories;
-public class JsonLearningTopicRepository : LearningTopicRepository
+/*public class JsonLearningTopicRepository : LearningTopicRepository
 {
     private readonly string _filePath;
 
@@ -46,4 +46,4 @@ public class JsonLearningTopicRepository : LearningTopicRepository
 
         await File.WriteAllTextAsync(_filePath, json);
     }
-}
+}*/
